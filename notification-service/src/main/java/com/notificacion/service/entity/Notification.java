@@ -5,8 +5,13 @@ import lombok.Data;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Notification {
-
-    private String recipient;
-    private String message;
+    private Lond id; 
+    private String type;
+    private String title;
+    private String content;
+    private LocalDateTime timestamp;
+    private boolean read;
 }
