@@ -8,7 +8,7 @@ import lombok.Data;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Notification {
-    private Lond id; 
+    private Long id;
     private String type;
     private String title;
     private String content;
