@@ -9,9 +9,9 @@
 		<relativePath/>
 	</parent>
 	<groupId>com.dev</groupId>
-	<artifactId>user-manage</artifactId>
+	<artifactId>user-management-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>user-manage</name>
+	<name>user-management-service</name>
 	<description>User manage app</description>
 	<url/>
 	<licenses>
@@ -92,6 +92,11 @@
 			<groupId>com.mysql</groupId>
 			<artifactId>mysql-connector-j</artifactId>
 			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.example</groupId>
+			<artifactId>common-events</artifactId>
+			<version>1.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 
