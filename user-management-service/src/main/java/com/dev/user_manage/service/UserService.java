@@ -7,6 +7,7 @@ import com.dev.user_manage.entity.Role;
 import com.dev.user_manage.entity.User;
 import com.dev.user_manage.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import main.java.com.model.UserCreatedEvent;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -25,18 +27,27 @@ public class UserService {
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
     private final UserRepository userRepository;
+    private final KafkaTemplate<String, UserCreatedEvent> kafkaTemplate;
 
     public User register(RegisterUser registerUser){
         User user = mapToUser(registerUser);
         return userRepository.save(user);
+
+        UserCreatedEvent event = UserCreatedEvent.builder()
+                .userId(savedUser.getUserId())
+                .createdAt(Instant.now())
+                .build();
+        kafkaTemplate.send(userCreationTopic, event);
+
+        return savedUser;
     }
 
     public String auth(AuthUser authUser) {
-        // Primero autenticar (esto lanzará una excepción si falla)
+
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(authUser.getUsername(), authUser.getPassword())
         );
-        // Luego generar el token
+
         return jwtService.generateJwtToken(authUser.getUsername());
     }
 
