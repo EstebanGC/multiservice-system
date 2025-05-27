@@ -6,6 +6,7 @@ import com.dev.user_manage.dto.UpdateUser;
 import com.dev.user_manage.entity.Role;
 import com.dev.user_manage.entity.User;
 import com.dev.user_manage.repository.UserRepository;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import main.java.com.model.UserCreatedEvent;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,13 +14,16 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.transaction.annotation.Transactional;
+import com
 
 import java.time.Instant;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Builder
 public class UserService {
 
     private final PasswordEncoder passwordEncoder;
