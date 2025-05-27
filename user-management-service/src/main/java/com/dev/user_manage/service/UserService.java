@@ -21,7 +21,6 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Builder
 public class UserService {
 
     @Value("${spring.kafka.topic.user-creation}")
