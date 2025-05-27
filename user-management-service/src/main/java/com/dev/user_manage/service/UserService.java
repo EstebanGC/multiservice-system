@@ -2,21 +2,19 @@ package com.dev.user_manage.service;
 
 import com.dev.user_manage.dto.AuthUser;
 import com.dev.user_manage.dto.RegisterUser;
-import com.dev.user_manage.dto.UpdateUser;
 import com.dev.user_manage.entity.Role;
 import com.dev.user_manage.entity.User;
 import com.dev.user_manage.repository.UserRepository;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
-import main.java.com.model.UserCreatedEvent;
+import com.model.UserCreatedEvent;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.transaction.annotation.Transactional;
-import com
+import org.springframework.beans.factory.annotation.Value;
 
 import java.time.Instant;
 import java.util.List;
@@ -26,6 +24,8 @@ import java.util.List;
 @Builder
 public class UserService {
 
+    @Value("${spring.kafka.topic.user-creation}")
+    private String userCreationTopic;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
@@ -35,10 +35,11 @@ public class UserService {
 
     public User register(RegisterUser registerUser){
         User user = mapToUser(registerUser);
-        return userRepository.save(user);
+
+        User savedUser = userRepository.save(user);
 
         UserCreatedEvent event = UserCreatedEvent.builder()
-                .userId(savedUser.getUserId())
+                .userId(savedUser.getUser_Id())
                 .createdAt(Instant.now())
                 .build();
         kafkaTemplate.send(userCreationTopic, event);
