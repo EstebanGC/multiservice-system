@@ -21,6 +21,7 @@ public class KafkaConsumerConfig {
     public ConsumerFactory<String, UserCreatedEvent> consumerFactory() {
         JsonDeserializer<UserCreatedEvent> deserializer = new JsonDeserializer<>(UserCreatedEvent.class);
         deserializer.addTrustedPackages("com.model");
+        System.out.println("Whatever");
 
         Map<String, Object> config = new HashMap<>();
         config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
