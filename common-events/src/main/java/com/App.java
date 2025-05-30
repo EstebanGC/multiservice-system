@@ -1,9 +1,9 @@
-package com.example;
+package com;
 
 public class App 
 {
     public static void main( String[] args )
     {
-        System.out.println( "Common events!"+"Whatever and whenever, whoever" );
+        System.out.println( "Common events!");
     }
 }
