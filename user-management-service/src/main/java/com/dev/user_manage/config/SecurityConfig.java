@@ -1,6 +1,5 @@
 package com.dev.user_manage.config;
 
-import com.dev.user_manage.entity.User;
 import com.dev.user_manage.filter.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

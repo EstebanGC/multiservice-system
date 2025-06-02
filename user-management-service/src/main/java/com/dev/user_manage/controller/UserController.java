@@ -33,33 +33,4 @@ public class UserController {
     public ResponseEntity<List<User>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
-//
-//    @GetMapping("/{id}")
-//    @PreAuthorize("hasAuthority('ADMIN') or @userService.isUserOwner(#id, authentication.principal.username)")
-//    public ResponseEntity<User> getUserById(@PathVariable String id) {
-//        return ResponseEntity.ok(userService.getUserById(id));
-//    }
-//
-//    @PutMapping("/{id}")
-//    @PreAuthorize("hasAuthority('ADMIN') or @userService.isUserOwner(#id, authentication.principal.username)")
-//    public ResponseEntity<User> updateUser(@PathVariable String id, @RequestBody UpdateUser updateUser) {
-//        return ResponseEntity.ok(userService.updateUser(id, updateUser));
-//    }
-//
-//    @DeleteMapping("/{id}")
-//    @PreAuthorize("hasAuthority('ADMIN')")
-//    public ResponseEntity<Void> deleteUser(@PathVariable String id) {
-//        userService.deleteUser(id);
-//        return ResponseEntity.ok().build();
-//    }
-//
-//    @PutMapping("/{id}/change-password")
-//    @PreAuthorize("hasAuthority('ADMIN') or @userService.isUserOwner(#id, authentication.principal.username)")
-//    public ResponseEntity<Void> changePassword(
-//            @PathVariable String id,
-//            @RequestParam String oldPassword,
-//            @RequestParam String newPassword) {
-//        userService.changePassword(id, oldPassword, newPassword);
-//        return ResponseEntity.ok().build();
-//    }
 }

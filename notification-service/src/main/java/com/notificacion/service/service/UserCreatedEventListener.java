@@ -1,6 +1,6 @@
 package com.notificacion.service.service;
 
-import com.model.UserCreatedEvent;
+import com.example.model.UserCreatedEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;

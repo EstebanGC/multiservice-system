@@ -1,6 +1,6 @@
 package com.notificacion.service.config;
 
-import com.model.UserCreatedEvent;
+import com.example.model.UserCreatedEvent;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.context.annotation.Bean;

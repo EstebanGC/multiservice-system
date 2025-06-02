@@ -5,9 +5,8 @@ import com.dev.user_manage.dto.RegisterUser;
 import com.dev.user_manage.entity.Role;
 import com.dev.user_manage.entity.User;
 import com.dev.user_manage.repository.UserRepository;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
-import com.model.UserCreatedEvent;
+import com.example.model.UserCreatedEvent;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,17 +15,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.beans.factory.annotation.Value;
 
-import java.time.Instant;
+import org.joda.time.Instant;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
-    @Value("${spring.kafka.topic.user-creation}")
+    @Value("${app.kafka.user-creation-topic}")
     private String userCreationTopic;
     private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
+    private final com.dev.user_manage.service.JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
     private final UserRepository userRepository;
