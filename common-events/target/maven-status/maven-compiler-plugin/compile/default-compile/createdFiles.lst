@@ -1,4 +1,4 @@
+com\App.class
 com\model\UserCreatedEvent.class
 main\java\com\model\EventType.class
-com\example\App.class
 com\model\UserCreatedEvent$UserCreatedEventBuilder.class
