@@ -26,7 +26,6 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(httpRequest -> {
-                    // Fix the paths to match the actual controller endpoints
                     httpRequest.requestMatchers("/api/users/register", "/api/users/auth").permitAll();
                     httpRequest.requestMatchers(HttpMethod.POST).hasAuthority("ADMIN");
                     httpRequest.anyRequest().authenticated();

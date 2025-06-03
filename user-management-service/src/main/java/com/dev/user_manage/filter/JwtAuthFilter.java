@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -24,6 +25,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+
+    private static final List<String> EXCLUDE_URLS = List.of(
+            "/api/users/register",
+            "/api/users/auth"
+    );
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+        return EXCLUDE_URLS.contains(path);
+    }
 
     @Override
     protected void doFilterInternal(
@@ -34,17 +46,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         final String authHeader = request.getHeader("Authorization");
         final SecurityContext context = SecurityContextHolder.getContext();
 
-        // If there's no Authorization header or it doesn't start with "Bearer " or authentication is already set
         if (authHeader == null || !authHeader.startsWith("Bearer ") || context.getAuthentication() != null) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // Extract token and process
-        final String jwtToken = authHeader.substring(7); // Remove "Bearer " prefix
+        final String jwtToken = authHeader.substring(7);
         final String username = jwtService.extractSubject(jwtToken);
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        if (username != null && context.getAuthentication() == null) {
             if (jwtService.isTokenValid(jwtToken)) {
                 User user = (User) userDetailsService.loadUserByUsername(username);
                 var authToken = new UsernamePasswordAuthenticationToken(

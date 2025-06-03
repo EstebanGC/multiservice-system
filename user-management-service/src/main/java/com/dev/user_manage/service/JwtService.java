@@ -2,8 +2,10 @@ package com.dev.user_manage.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -16,25 +18,29 @@ public class JwtService {
     @Value("${jwt.secret}")
     private String secret;
 
-    private SecretKey generateSigningKey() {
-        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
+    private SecretKey signingKey;
+
+    @PostConstruct
+    public void init() {
+        signingKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
     }
 
-    public String generateJwtToken(String username) {
-        Date issuedAt = new Date(System.currentTimeMillis());
-        Date expirationDate = new Date(System.currentTimeMillis() + (1000 * 60 * 60 * 24));
+//    private SecretKey generateSigningKey() {
+//        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
+//    }
 
+    public String generateJwtToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
-                .setIssuedAt(issuedAt)
-                .setExpiration(expirationDate)
-                .signWith(generateSigningKey())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 86_400_000)) // 24h
+                .signWith(signingKey, SignatureAlgorithm.HS384) // Fuerza HS384
                 .compact();
     }
 
     private Claims extractClaims(String jwtToken) {
         return Jwts.parserBuilder()
-                .setSigningKey(generateSigningKey())
+                .setSigningKey(signingKey)
                 .build()
                 .parseClaimsJws(jwtToken)
                 .getBody();
@@ -49,6 +55,11 @@ public class JwtService {
     }
 
     public boolean isTokenValid(String jwtToken) {
-        return new Date().before(extractExpiration(jwtToken));
+        try {
+            extractClaims(jwtToken);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
