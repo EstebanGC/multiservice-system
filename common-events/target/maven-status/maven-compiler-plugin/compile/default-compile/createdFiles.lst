@@ -1,0 +1,3 @@
+com\example\model\EventType.class
+com\example\model\UserCreatedEvent$UserCreatedEventBuilder.class
+com\example\model\UserCreatedEvent.class
