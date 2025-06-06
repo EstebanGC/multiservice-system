@@ -10,7 +10,7 @@ This project is a notification microservice developed with Spring Boot. It uses 
 - Spring Boot 3.x
 - Apache Kafka
 - Maven
-- (Optional) Database (e.g., PostgreSQL)
+- MySQL
 
 ## Main Features
 
