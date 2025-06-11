@@ -5,6 +5,7 @@
       <sourceFolder url="file://$MODULE_DIR$/common-events/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/notification-service/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/user-management-service/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/product-service/src" isTestSource="false" />
     </content>
   </component>
 </module>

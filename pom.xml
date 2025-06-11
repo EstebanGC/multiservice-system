@@ -18,7 +18,7 @@
     <module>user-management-service</module>
     <module>notification-service</module>
     <module>common-events</module>
-
+    <module>product-service</module>
   </modules>
 
   <properties>
