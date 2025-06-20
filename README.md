@@ -2,7 +2,7 @@
 
 ## Project Summary
 
-This project is a notification microservice developed with Spring Boot. It uses Apache Kafka for asynchronous communication and message processing. The service consumes messages from a Kafka topic, processes the information, and manages the delivery of notifications to users.
+This project is a microservices system developed with Spring Boot. It uses Apache Kafka for asynchronous communication and message processing. The service consumes messages from a Kafka topic, processes the information, and manages the delivery of notifications to users when an user is created, a product is created, edited, among others.
 
 ## Technologies Used
 
