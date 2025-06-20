@@ -25,10 +25,6 @@ public class JwtService {
         signingKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
     }
 
-//    private SecretKey generateSigningKey() {
-//        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
-//    }
-
     public String generateJwtToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
