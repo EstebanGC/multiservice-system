@@ -15,6 +15,7 @@ public class ProductController {
 
     private final ProductService productService;
 
+    //Configure this to protect the route
     @PostMapping("/product")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Product> createProduct(@RequestBody Product product) {
