@@ -1,11 +1,8 @@
 package com.dev.user_manage.config;
 
 import io.jsonwebtoken.security.Keys;
-
 import javax.crypto.SecretKey;
-import java.security.SecureRandom;
 import java.util.Base64;
-import java.util.HexFormat;
 
 public class JwtSecretGenerator {
 

@@ -22,7 +22,7 @@ public class UserController {
     public ResponseEntity<User> register(@RequestBody RegisterUser registerUser) {
         return ResponseEntity.ok(userService.register(registerUser));
     }
-
+    //check params
     @PostMapping("/auth")
     public ResponseEntity<String> auth(@RequestBody AuthUser authUser) {
         return ResponseEntity.ok(userService.auth(authUser));
