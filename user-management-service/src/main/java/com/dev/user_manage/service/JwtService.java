@@ -30,7 +30,7 @@ public class JwtService {
                 .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 86_400_000)) // 24h
-                .signWith(signingKey, SignatureAlgorithm.HS384) // Fuerza HS384
+                .signWith(signingKey, SignatureAlgorithm.HS384)
                 .compact();
     }
 
