@@ -1,6 +1,7 @@
 package com.example.product_service.service;
 
 import com.example.product_service.model.Product;
+import com.example.product_service.service.ProductService;
 import com.example.product_service.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

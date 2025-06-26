@@ -26,13 +26,11 @@ public class ProductSecurityConfig {
     }
 
     @Bean
-    public UserDetailsService users() {
-        UserDetails admin = User.withDefaultPasswordEncoder()
-                .username("admin")
-                .password("admin123")
+    public UserDetailsService userDetailsService() {
+        UserDetails admin = User.withUsername("admin")
+                .password("{noop}admin123") // usa {noop} para evitar encoding si estás probando
                 .roles("ADMIN")
                 .build();
-
         return new InMemoryUserDetailsManager(admin);
     }
 }
