@@ -56,7 +56,7 @@ public class AppConfig implements CommandLineRunner {
                 .lastname("iquark")
                 .username("iquark")
                 .password(passwordEncoder().encode("iquark"))
-                .roles(List.of(Role.ADMIN.name(), Role.USER.name()))
+                .roles(List.of(Role.ROLE_ADMIN, Role.ROLE_USER))
                 .build();
         userRepository.save(user);
     }

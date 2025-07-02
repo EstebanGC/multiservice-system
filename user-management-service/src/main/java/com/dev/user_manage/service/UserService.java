@@ -37,7 +37,7 @@ public class UserService {
         User savedUser = userRepository.save(user);
 
         UserCreatedEvent event = UserCreatedEvent.builder()
-                .userId(savedUser.getUser_Id())
+                .userId(savedUser.getUserId())
                 .createdAt(Instant.now())
                 .build();
         kafkaTemplate.send(userCreationTopic, event);
@@ -60,7 +60,7 @@ public class UserService {
                 .firstname(registerUser.getFirstname())
                 .lastname(registerUser.getLastname())
                 .password(passwordEncoder.encode(registerUser.getPassword()))
-                .roles(List.of(Role.USER.name()))
+                .roles(List.of(Role.ROLE_USER))
                 .build();
     }
 

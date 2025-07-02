@@ -27,7 +27,7 @@ public class SecurityConfig {
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(httpRequest -> {
                     httpRequest.requestMatchers("/api/users/register", "/api/users/auth").permitAll();
-                    httpRequest.requestMatchers(HttpMethod.POST).hasAuthority("ADMIN");
+                    httpRequest.requestMatchers(HttpMethod.POST).hasAuthority("ROLE_ADMIN");
                     httpRequest.anyRequest().authenticated();
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
