@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +24,7 @@ public class UserController {
     private final UserService userService;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final UserDetailsService userDetailsService;
 
     @PostMapping("/register")
     public ResponseEntity<User> register(@RequestBody RegisterUser registerUser) {
@@ -32,6 +35,7 @@ public class UserController {
     public ResponseEntity<String> auth(@RequestBody AuthUser authUser) {
         System.out.println("Username: " + authUser.getUsername());
         System.out.println("Password: " + authUser.getPassword());
+
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         authUser.getUsername(),
@@ -39,7 +43,10 @@ public class UserController {
                 )
         );
 
-        return ResponseEntity.ok(jwtService.generateJwtToken(authUser.getUsername()));
+        User user = userService.loadUserByUsername(authUser.getUsername());
+        String jwt = jwtService.generateJwtToken(user);
+
+        return ResponseEntity.ok(jwt);
     }
 
     @GetMapping

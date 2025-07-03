@@ -10,6 +10,7 @@ import com.example.model.UserCreatedEvent;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -51,7 +52,18 @@ public class UserService {
                 new UsernamePasswordAuthenticationToken(authUser.getUsername(), authUser.getPassword())
         );
 
-        return jwtService.generateJwtToken(authUser.getUsername());
+        User userDetails = (User) userDetailsService.loadUserByUsername(authUser.getUsername());
+
+        return jwtService.generateJwtToken(userDetails);
+    }
+
+    public List<User> getAllUsers() {
+        return (List<User>) userRepository.findAll();
+    }
+
+    public User loadUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     private User mapToUser(RegisterUser registerUser){
@@ -64,7 +76,5 @@ public class UserService {
                 .build();
     }
 
-    public List<User> getAllUsers() {
-        return (List<User>) userRepository.findAll();
-    }
+
 }

@@ -48,16 +48,17 @@ public class AppConfig implements CommandLineRunner {
         return config.getAuthenticationManager();
     }
 
-    //whatever
     @Override
-    public void run(String... args) throws Exception{
-        User user = User.builder()
-                .firstname("iquark")
-                .lastname("iquark")
-                .username("iquark")
-                .password(passwordEncoder().encode("iquark"))
-                .roles(List.of(Role.ROLE_ADMIN, Role.ROLE_USER))
-                .build();
-        userRepository.save(user);
+    public void run(String... args) throws Exception {
+        if (userRepository.findByUsername("iquark").isEmpty()) {
+            User user = User.builder()
+                    .firstname("iquark")
+                    .lastname("iquark")
+                    .username("iquark")
+                    .password(passwordEncoder().encode("iquark"))
+                    .roles(List.of(Role.ROLE_ADMIN, Role.ROLE_USER))
+                    .build();
+            userRepository.save(user);
+        }
     }
 }
