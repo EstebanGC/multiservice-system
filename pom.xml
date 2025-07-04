@@ -19,6 +19,7 @@
     <module>notification-service</module>
     <module>common-events</module>
     <module>product-service</module>
+    <module>cart-service</module>
   </modules>
 
   <properties>
