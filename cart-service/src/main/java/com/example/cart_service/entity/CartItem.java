@@ -20,6 +20,6 @@ public class CartItem {
     private Integer quantity;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = 'cart_id')
+    @JoinColumn(name = "cart_id")
     private Cart cart;
 }
