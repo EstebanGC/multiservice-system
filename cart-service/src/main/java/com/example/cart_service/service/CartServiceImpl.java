@@ -39,5 +39,23 @@ public class CartServiceImpl implements CartService {
         cartRepository.save(cart);
     }
 
+    @Transactional
+    public void removeItem(Long userId, Long productId) {
+        Cart cart = cartRepository.findUserById(userId)
+                .orElseThrow(() -> new IllegalStateException("Cart not found"));
+
+        cart.getItems().removeIf(item ->item.getProductId().equals(productId));
+        cartRepository.save(cart);
+    }
+
+    @Transactional
+    public void clearItem(Long userId) {
+        Cart cart = cartRepository.findUserById(userId)
+                .orElseThrow(() -> new IllegalStateException("Cart not found"));
+
+        cart.getItems().clear();
+        cartRepository.save(cart);
+    }
+
 
 }
