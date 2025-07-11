@@ -1,6 +1,9 @@
 package com.example.cart_service.service;
 
+import com.example.cart_service.client.ProductClient;
 import com.example.cart_service.dto.AddToCartRequest;
+import com.example.cart_service.dto.CartItemResponse;
+import com.example.cart_service.dto.CartResponse;
 import com.example.cart_service.entity.Cart;
 import com.example.cart_service.entity.CartItem;
 import com.example.cart_service.repository.CartRepository;
@@ -8,14 +11,16 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
     
     private final CartRepository cartRepository;
-//    private final ProductClient productClient;
+    private final ProductClient productClient;
 
     @Transactional
     public void addToCart(Long userId, AddToCartRequest request){
@@ -29,7 +34,7 @@ public class CartServiceImpl implements CartService {
         if (maybeItem.isPresent()) {
             CartItem item = maybeItem.get();
             item.setQuantity(item.getQuantity() + request.getQuantity());
-        }else{
+        } else {
             CartItem newItem = new CartItem();
             newItem.setProductId(request.getProductId());
             newItem.setQuantity(request.getQuantity());
@@ -55,6 +60,21 @@ public class CartServiceImpl implements CartService {
 
         cart.getItems().clear();
         cartRepository.save(cart);
+    }
+
+    @Transactional
+    public CartResponse getCartResponse(Long userId){
+        Cart cart = cartRepository.findUserById(userId)
+                .orElseGet(() -> cartRepository.save(Cart.createEmptyForUser(userId)));
+
+        List<CartItemResponse> itemResponses = cart.getItems().stream()
+                .map( item -> {
+                    ProductClient.ProductDTO p = productClient.getProduct(item.getProductId());
+                    return new CartItemResponse(p.id(), p.name(), p.price(), item.getQuantity());
+                })
+                .collect(Collectors.toList());
+
+        return new CartResponse(cart.getId(), userId, itemResponses);
     }
 
 
