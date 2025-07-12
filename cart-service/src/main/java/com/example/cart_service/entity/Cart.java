@@ -1,18 +1,17 @@
 package com.example.cart_service.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
 @Entity
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Cart {
 
     @Id
@@ -25,9 +24,9 @@ public class Cart {
     private List<CartItem> items = new ArrayList<>();
 
     public static Cart createEmptyForUser(Long userId) {
-        Cart cart = new Cart();
-        cart.setUserId(userId);
-        cart.setItems(new ArrayList<>());
-        return cart;
+        return Cart.builder()
+                .userId(userId)
+                .items(new ArrayList<>())
+                .build();
     }
 }

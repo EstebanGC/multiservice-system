@@ -2,11 +2,10 @@ package com.example.cart_service.controller;
 
 import com.example.cart_service.dto.AddToCartRequest;
 import com.example.cart_service.service.CartService;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
-
-import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/cart")
@@ -17,7 +16,7 @@ public class CartController {
 
     @PostMapping("/add")
     public void addToCart(@RequestBody AddToCartRequest request, JwtAuthenticationToken jwt) {
-        Long userId = Long.parseLong(jwt.getToken().getSubject()); // "sub" del token = userId
+        Long userId = Long.parseLong(jwt.getToken().getSubject());
         cartService.addToCart(userId, request);
     }
 }
