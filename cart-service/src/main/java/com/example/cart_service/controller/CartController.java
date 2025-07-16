@@ -2,7 +2,6 @@ package com.example.cart_service.controller;
 
 import com.example.cart_service.dto.AddToCartRequest;
 import com.example.cart_service.service.CartService;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
