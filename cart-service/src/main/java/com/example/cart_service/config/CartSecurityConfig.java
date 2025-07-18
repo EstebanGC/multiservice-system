@@ -4,6 +4,7 @@ package com.example.cart_service.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -29,17 +30,17 @@ public class CartSecurityConfig {
                         .anyRequest().permitAll()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(jwt -> jwt.decoder(jwtDecoder()))
+                        .jwt(Customizer.withDefaults())
                 );
 
         return http.build();
     }
 
     @Bean
-    public JwtDecoder jwtDecoder() {
+    public JwtDecoder jwtDecoder(@Value("${jwt.secret}") String secret) {
         byte[] keyBytes = Base64.getDecoder().decode(secret);
         return NimbusJwtDecoder
-                .withSecretKey(new SecretKeySpec(keyBytes, "HmacSHA384"))
+                .withSecretKey(new SecretKeySpec(keyBytes, "HmacSHA256"))
                 .build();
     }
 }

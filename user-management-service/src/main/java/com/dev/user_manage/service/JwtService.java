@@ -39,7 +39,7 @@ public class JwtService {
                 .setSubject(user.getUsername())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 86_400_000)) // 24h
-                .signWith(signingKey, SignatureAlgorithm.HS384)
+                .signWith(signingKey, SignatureAlgorithm.HS256)
                 .compact();
     }
 
@@ -50,7 +50,6 @@ public class JwtService {
                 .parseClaimsJws(jwtToken)
                 .getBody();
     }
-
 
     public String extractSubject(String jwtToken) {
         return extractClaims(jwtToken).getSubject();
