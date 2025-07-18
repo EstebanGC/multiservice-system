@@ -1,5 +1,7 @@
 package com.example.cart_service.config;
 
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -9,17 +11,21 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import javax.crypto.spec.SecretKeySpec;
+import java.util.Base64;
 
 @Configuration
 @EnableWebSecurity
 public class CartSecurityConfig {
+
+    @Value("${jwt.secret}")
+    private String secret;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/cart/**").authenticated()
+                        .requestMatchers("/api/cart/add").authenticated()
                         .anyRequest().permitAll()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
@@ -31,7 +37,9 @@ public class CartSecurityConfig {
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        String secret = "XTXyBQ4p+tyKsmWnjqA2Eg1uMa9FWak+/nhZbso6MpIHkogujhWePCJ2KdLt/Vp/";
-        return NimbusJwtDecoder.withSecretKey(new SecretKeySpec(secret.getBytes(), "HmacSHA256")).build();
+        byte[] keyBytes = Base64.getDecoder().decode(secret);
+        return NimbusJwtDecoder
+                .withSecretKey(new SecretKeySpec(keyBytes, "HmacSHA384"))
+                .build();
     }
 }

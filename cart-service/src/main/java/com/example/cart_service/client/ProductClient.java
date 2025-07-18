@@ -9,7 +9,7 @@ public class ProductClient {
     private final WebClient webClient;
 
     public ProductClient(WebClient.Builder builder) {
-        this.webClient = builder.baseUrl("http://localhost:8080/api/products").build();
+        this.webClient = builder.baseUrl("http://localhost:8081/api/products").build();
     }
 
     public ProductDTO getProduct(Long productId) {
