@@ -13,7 +13,7 @@ import javax.crypto.SecretKey;
 @Service
 public class JwtService {
 
-    @Value("${jwt.secrer}")
+    @Value("${jwt.secret}")
     private String secret;
 
     private SecretKey signingKey;
