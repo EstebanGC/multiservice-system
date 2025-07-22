@@ -1,8 +1,8 @@
-# Notification Service
+# Multiservice System
 
 ## Project Summary
 
-This project is a microservices system developed with Spring Boot. It uses Apache Kafka for asynchronous communication and message processing. The service consumes messages from a Kafka topic, processes the information, and manages the delivery of notifications to users when an user is created, a product is created, edited, among others.
+This project is a microservices system developed with Spring Boot. It uses Apache Kafka for asynchronous communication and message processing. The service consumes messages from a Kafka topic, processes the information, and manages the delivery of notifications to users when an user is created, a product is created, a product is added to a cart, among others.
 
 ## Technologies Used
 
@@ -30,4 +30,4 @@ This project is a microservices system developed with Spring Boot. It uses Apach
 1. Clone the repository:
    ```bash
    git clone https://github.com/yourusername/notification-service.git
-   cd notification-service
+ 
