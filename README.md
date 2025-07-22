@@ -29,5 +29,5 @@ This project is a microservices system developed with Spring Boot. It uses Apach
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/notification-service.git
+   git clone https://github.com/EstebanGC/notification-service.git
  
