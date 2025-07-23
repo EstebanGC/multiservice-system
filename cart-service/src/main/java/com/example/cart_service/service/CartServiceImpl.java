@@ -23,9 +23,9 @@ public class CartServiceImpl implements CartService {
     private final ProductClient productClient;
 
     @Transactional
-    public void addToCart(Long userId, AddToCartRequest request){
-        Cart cart = cartRepository.findUserById(userId)
-                .orElseGet(() -> cartRepository.save(Cart.createEmptyForUser(userId)));
+    public void addToCart(String username, AddToCartRequest request){
+        Cart cart = cartRepository.findUserById(username)
+                .orElseGet(() -> cartRepository.save(Cart.createEmptyForUser(username)));
 
         Optional<CartItem> maybeItem = cart.getItems().stream()
                 .filter(ci -> ci.getProductId().equals(request.getProductId()))
