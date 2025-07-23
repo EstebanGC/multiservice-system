@@ -18,14 +18,14 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long userId;
+    private String username;
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartItem> items = new ArrayList<>();
 
-    public static Cart createEmptyForUser(Long userId) {
+    public static Cart createEmptyForUser(String  username) {
         return Cart.builder()
-                .userId(userId)
+                .username(username)
                 .items(new ArrayList<>())
                 .build();
     }

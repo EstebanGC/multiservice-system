@@ -24,7 +24,7 @@ public class CartServiceImpl implements CartService {
 
     @Transactional
     public void addToCart(String username, AddToCartRequest request){
-        Cart cart = cartRepository.findUserById(username)
+        Cart cart = cartRepository.findUserByUsername(username)
                 .orElseGet(() -> cartRepository.save(Cart.createEmptyForUser(username)));
 
         Optional<CartItem> maybeItem = cart.getItems().stream()
@@ -45,8 +45,8 @@ public class CartServiceImpl implements CartService {
     }
 
     @Transactional
-    public void removeItem(Long userId, Long productId) {
-        Cart cart = cartRepository.findUserById(userId)
+    public void removeItem(String username, Long productId) {
+        Cart cart = cartRepository.findUserByUsername(username)
                 .orElseThrow(() -> new IllegalStateException("Cart not found"));
 
         cart.getItems().removeIf(item ->item.getProductId().equals(productId));
@@ -54,8 +54,8 @@ public class CartServiceImpl implements CartService {
     }
 
     @Transactional
-    public void clearItem(Long userId) {
-        Cart cart = cartRepository.findUserById(userId)
+    public void clearItem(String username) {
+        Cart cart = cartRepository.findUserByUsername(username)
                 .orElseThrow(() -> new IllegalStateException("Cart not found"));
 
         cart.getItems().clear();
@@ -63,9 +63,9 @@ public class CartServiceImpl implements CartService {
     }
 
     @Transactional
-    public CartResponse getCartResponse(Long userId){
-        Cart cart = cartRepository.findUserById(userId)
-                .orElseGet(() -> cartRepository.save(Cart.createEmptyForUser(userId)));
+    public CartResponse getCartResponse(String username){
+        Cart cart = cartRepository.findUserByUsername(username)
+                .orElseGet(() -> cartRepository.save(Cart.createEmptyForUser(username)));
 
         List<CartItemResponse> itemResponses = cart.getItems().stream()
                 .map( item -> {
@@ -74,7 +74,7 @@ public class CartServiceImpl implements CartService {
                 })
                 .collect(Collectors.toList());
 
-        return new CartResponse(cart.getId(), userId, itemResponses);
+        return new CartResponse(cart.getId(), username, itemResponses);
     }
     
 }
