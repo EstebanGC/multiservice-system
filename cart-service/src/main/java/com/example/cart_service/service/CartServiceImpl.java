@@ -23,9 +23,14 @@ public class CartServiceImpl implements CartService {
     private final ProductClient productClient;
 
     @Transactional
-    public void addToCart(String username, AddToCartRequest request){
+    public void addToCart(String username, AddToCartRequest request) {
+        System.out.println("Request recibido - productId: " + request.getProductId() + ", quantity: " + request.getQuantity());
+
         Cart cart = cartRepository.findUserByUsername(username)
-                .orElseGet(() -> cartRepository.save(Cart.createEmptyForUser(username)));
+                .orElseGet(() -> {
+                    System.out.println("No se encontró carrito, se crea uno nuevo para: " + username);
+                    return cartRepository.save(Cart.createEmptyForUser(username));
+                });
 
         Optional<CartItem> maybeItem = cart.getItems().stream()
                 .filter(ci -> ci.getProductId().equals(request.getProductId()))
@@ -34,14 +39,18 @@ public class CartServiceImpl implements CartService {
         if (maybeItem.isPresent()) {
             CartItem item = maybeItem.get();
             item.setQuantity(item.getQuantity() + request.getQuantity());
+            System.out.println("Producto ya estaba en el carrito. Nueva cantidad: " + item.getQuantity());
         } else {
             CartItem newItem = new CartItem();
             newItem.setProductId(request.getProductId());
             newItem.setQuantity(request.getQuantity());
             newItem.setCart(cart);
             cart.getItems().add(newItem);
+            System.out.println("Producto nuevo agregado al carrito - productId: " + newItem.getProductId() + ", quantity: " + newItem.getQuantity());
         }
+
         cartRepository.save(cart);
+        System.out.println("Carrito guardado exitosamente");
     }
 
     @Transactional
