@@ -15,7 +15,7 @@ public class CartController {
     private final CartService cartService;
 
     @PostMapping("/add")
-    public void addToCart(AddToCartRequest request, @AuthenticationPrincipal Jwt jwt) {
+    public void addToCart(@RequestBody AddToCartRequest request, @AuthenticationPrincipal Jwt jwt) {
         String username = jwt.getSubject();
         cartService.addToCart(username, request);
     }
