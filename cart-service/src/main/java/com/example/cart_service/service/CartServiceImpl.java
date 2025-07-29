@@ -33,10 +33,10 @@ public class CartServiceImpl implements CartService {
                 });
 
         Optional<CartItem> maybeItem = cart.getItems().stream()
-                .filter(ci -> ci.getProductId().equals(request.getProductId()))
+                .filter(ci -> request.getProductId().equals(ci.getProductId()))
                 .findFirst();
 
-        //whatever
+        //whatevercd ..\
         if (maybeItem.isPresent()) {
             CartItem item = maybeItem.get();
             item.setQuantity(item.getQuantity() + request.getQuantity());
