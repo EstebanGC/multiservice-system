@@ -26,8 +26,8 @@ public class CartSecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/cart/add").authenticated()
-                        .anyRequest().permitAll()
+                        .requestMatchers("/api/cart/add").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(Customizer.withDefaults())

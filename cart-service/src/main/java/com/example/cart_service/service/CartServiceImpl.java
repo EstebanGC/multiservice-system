@@ -36,7 +36,6 @@ public class CartServiceImpl implements CartService {
                 .filter(ci -> request.getProductId().equals(ci.getProductId()))
                 .findFirst();
 
-        //whatevercd ..\
         if (maybeItem.isPresent()) {
             CartItem item = maybeItem.get();
             item.setQuantity(item.getQuantity() + request.getQuantity());
