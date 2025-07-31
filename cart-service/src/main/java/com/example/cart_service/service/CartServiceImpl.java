@@ -23,13 +23,13 @@ public class CartServiceImpl implements CartService {
     private final ProductClient productClient;
 
     @Transactional
-    public void addToCart(String username, AddToCartRequest request) {
+    public void addToCart(String sessionId, AddToCartRequest request) {
         System.out.println("Request received - productId: " + request.getProductId() + ", quantity: " + request.getQuantity());
 
-        Cart cart = cartRepository.findUserByUsername(username)
+        Cart cart = cartRepository.findUserBySessionId(sessionId)
                 .orElseGet(() -> {
-                    System.out.println("Cart not found - creating new one for: " + username);
-                    return cartRepository.save(Cart.createEmptyForUser(username));
+                    System.out.println("Cart not found - creating new one for: " + sessionId);
+                    return cartRepository.save(Cart.createEmptyForSession(sessionId));
                 });
 
         Optional<CartItem> maybeItem = cart.getItems().stream()
@@ -54,8 +54,8 @@ public class CartServiceImpl implements CartService {
     }
 
     @Transactional
-    public void removeItem(String username, Long productId) {
-        Cart cart = cartRepository.findUserByUsername(username)
+    public void removeItem(String sessionId, Long productId) {
+        Cart cart = cartRepository.findUserBySessionId(sessionId)
                 .orElseThrow(() -> new IllegalStateException("Cart not found"));
 
         cart.getItems().removeIf(item ->item.getProductId().equals(productId));
@@ -63,8 +63,8 @@ public class CartServiceImpl implements CartService {
     }
 
     @Transactional
-    public void clearItem(String username) {
-        Cart cart = cartRepository.findUserByUsername(username)
+    public void clearItem(String sessionId) {
+        Cart cart = cartRepository.findUserBySessionId(sessionId)
                 .orElseThrow(() -> new IllegalStateException("Cart not found"));
 
         cart.getItems().clear();
@@ -72,9 +72,9 @@ public class CartServiceImpl implements CartService {
     }
 
     @Transactional
-    public CartResponse getCartResponse(String username){
-        Cart cart = cartRepository.findUserByUsername(username)
-                .orElseGet(() -> cartRepository.save(Cart.createEmptyForUser(username)));
+    public CartResponse getCartResponse(String sessionId){
+        Cart cart = cartRepository.findUserBySessionId(sessionId)
+                .orElseGet(() -> cartRepository.save(Cart.createEmptyForSession(sessionId)));
 
         List<CartItemResponse> itemResponses = cart.getItems().stream()
                 .map( item -> {
@@ -83,7 +83,6 @@ public class CartServiceImpl implements CartService {
                 })
                 .collect(Collectors.toList());
 
-        return new CartResponse(cart.getId(), username, itemResponses);
+        return new CartResponse(cart.getId(), sessionId, itemResponses);
     }
-    
 }

@@ -10,6 +10,6 @@ import java.util.List;
 public class CartResponse {
 
     private Long cartId;
-    private String username;
+    private String sessionId;
     private List<CartItemResponse> items;
 }
