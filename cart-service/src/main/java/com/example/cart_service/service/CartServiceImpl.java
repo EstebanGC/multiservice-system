@@ -24,7 +24,7 @@ public class CartServiceImpl implements CartService {
 
     @Transactional
     public void addToCart(String sessionId, AddToCartRequest request) {
-        System.out.println("Request received - productId: " + request.getProductId() + ", quantity: " + request.getQuantity());
+
 
         Cart cart = cartRepository.findUserBySessionId(sessionId)
                 .orElseGet(() -> {
@@ -46,7 +46,6 @@ public class CartServiceImpl implements CartService {
             newItem.setQuantity(request.getQuantity());
             newItem.setCart(cart);
             cart.getItems().add(newItem);
-            System.out.println("New product added to cart - productId: " + newItem.getProductId() + ", quantity: " + newItem.getQuantity());
         }
 
         cartRepository.save(cart);
