@@ -16,10 +16,9 @@ public class CartController {
     private final CartService cartService;
 
     @PostMapping("/add")
-    public ResponseEntity<?> addToCart(@RequestBody @Valid AddToCartRequest request,
-                                       JwtAuthenticationToken auth) {
-        String username = auth.getName();
-        cartService.addToCart(username, request);
+    public ResponseEntity<?> addToCart(@RequestBody @Valid AddToCartRequest request) {
+        String sessionId = request.getSessionId();  // o de una cookie
+        cartService.addToCart(sessionId, request);
         return ResponseEntity.ok().build();
     }
 }
