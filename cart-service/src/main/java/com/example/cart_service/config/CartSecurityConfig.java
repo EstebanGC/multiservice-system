@@ -18,29 +18,14 @@ import java.util.Base64;
 @EnableWebSecurity
 public class CartSecurityConfig {
 
-    @Value("${jwt.secret}")
-    private String secret;
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/cart/add").permitAll()
+                        .requestMatchers("/api/cart/**").permitAll()
                         .anyRequest().authenticated()
-                )
-                .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(Customizer.withDefaults())
                 );
-
         return http.build();
-    }
-
-    @Bean
-    public JwtDecoder jwtDecoder(@Value("${jwt.secret}") String secret) {
-        byte[] keyBytes = Base64.getDecoder().decode(secret);
-        return NimbusJwtDecoder
-                .withSecretKey(new SecretKeySpec(keyBytes, "HmacSHA256"))
-                .build();
     }
 }
