@@ -22,34 +22,17 @@ public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
     private final ProductClient productClient;
 
-    @Transactional
-    public void addToCart(String sessionId, AddToCartRequest request) {
-
-
+    public void addToCartGuest(String sessionId, AddToCartRequest request){
         Cart cart = cartRepository.findUserBySessionId(sessionId)
-                .orElseGet(() -> {
-                    System.out.println("Cart not found - creating new one for: " + sessionId);
-                    return cartRepository.save(Cart.createEmptyForSession(sessionId));
-                });
+                .orElseGet(() -> cartRepository.save(Cart.createEmptyForSession(sessionId)));
+        addOrUpdateItem(cart, request);
+    }
 
-        Optional<CartItem> maybeItem = cart.getItems().stream()
-                .filter(ci -> request.getProductId().equals(ci.getProductId()))
-                .findFirst();
-
-        if (maybeItem.isPresent()) {
-            CartItem item = maybeItem.get();
-            item.setQuantity(item.getQuantity() + request.getQuantity());
-            System.out.println("Product already in the cart - New quantity: " + item.getQuantity());
-        } else {
-            CartItem newItem = new CartItem();
-            newItem.setProductId(request.getProductId());
-            newItem.setQuantity(request.getQuantity());
-            newItem.setCart(cart);
-            cart.getItems().add(newItem);
-        }
-
-        cartRepository.save(cart);
-        System.out.println("Cart saved successfully");
+    @Transactional
+    public void addToCartUser(String username, AddToCartRequest request) {
+        Cart cart = cartRepository.findUserByUsername(username)
+                .orElseGet(() -> cartRepository.save(Cart.createEmptyForUser(username)));
+        addOrUpdateItem(cart, request);
     }
 
     @Transactional

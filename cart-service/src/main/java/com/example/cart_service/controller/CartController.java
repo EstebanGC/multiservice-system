@@ -21,14 +21,28 @@ public class CartController {
     public ResponseEntity<?> addToCart(
             @RequestBody @Valid AddToCartRequest request,
             @CookieValue(value = "SESSIONID", required = false) String sessionId,
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
             HttpServletResponse response
     ) {
-        if (sessionId == null) {
-            sessionId = UUID.randomUUID().toString();
-            response.addHeader("Set-Cookie", "SESSIONID=" + sessionId + "; Path=/; HttpOnly");
+        String userId = null;
+
+        // Case 1: user authed by jwt
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String jwt = authHeader.substring(7);
+            userId = extractUserIdFromJwt(jwt); 
         }
 
-        cartService.addToCart(sessionId, request);
+        // Case 2: guest user by sessionid
+        if (userId == null) {
+            if (sessionId == null) {
+                sessionId = UUID.randomUUID().toString();
+                response.addHeader("Set-Cookie", "SESSIONID=" + sessionId + "; Path=/; HttpOnly");
+            }
+            cartService.addToCartGuest(sessionId, request);
+        } else {
+            cartService.addToCartUser(userId, request);
+        }
+
         return ResponseEntity.ok().build();
     }
 }
