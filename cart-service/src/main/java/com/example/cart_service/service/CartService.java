@@ -10,15 +10,17 @@ public interface CartService {
 
     void addToCartUser(String username, AddToCartRequest request);
 
-    void removeItemBySession(String sessionId, Long productId);
+    CartResponse getCartResponse(String username);
 
-    void removeItemByUser(String username, Long productId);
-
-    void clearCartBySession(String sessionId);
-
-    void clearCartByUser(String username);
-
-    CartResponse getCartBySession(String sessionId);
-
-    CartResponse getCartByUser(String username);
+//    void removeItemBySession(String sessionId, Long productId);
+//
+//    void removeItemByUser(String username, Long productId);
+//
+//    void clearCartBySession(String sessionId);
+//
+//    void clearCartByUser(String username);
+//
+//    CartResponse getCartBySession(String sessionId);
+//
+//    CartResponse getCartByUser(String username);
 }
