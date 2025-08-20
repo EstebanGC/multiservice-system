@@ -15,5 +15,4 @@ public class CartItemResponse {
     private String productName;
     private double price;
     private Integer quantity;
-
 }

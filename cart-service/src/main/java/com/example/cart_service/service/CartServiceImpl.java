@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -53,11 +52,27 @@ public class CartServiceImpl implements CartService {
         cartRepository.save(cart);
     }
 
-    public static CartItemResponse from(CartItem item) {
+    @Override
+    public CartResponse getCartResponse(String username) {
+        Cart cart = cartRepository.findUserByUsername(username)
+                .orElseThrow(() -> new IllegalStateException("Cart not found"));
+
+        return CartResponse.builder()
+                .cartId(cart.getId())
+                .sessionId(cart.getSessionId())
+                .items(cart.getItems().stream()
+                        .map(this::from) // 👈 convierte cada CartItem -> CartItemResponse
+                        .toList())
+                .build();
+    }
+
+    private CartItemResponse from(CartItem item) {
+        ProductClient.ProductDTO product = productClient.getProduct(item.getProductId());
+
         return CartItemResponse.builder()
                 .productId(item.getProductId())
-                .productName(item.getProductName())
-                .price(item.getPrice())
+                .productName(product.name())   // record getter
+                .price(product.price())        // record getter
                 .quantity(item.getQuantity())
                 .build();
     }
@@ -76,7 +91,7 @@ public class CartServiceImpl implements CartService {
         return cart;
     }
 
-    public void addOrUpdateIems(Cart cart, Long productId, int quantity) {
+    public void addOrUpdateItems(Cart cart, Long productId, int quantity) {
         Optional<CartItem> existingItem = cart.getItems().stream()
                 .filter(item -> item.getProductId().equals(productId))
                 .findFirst();
@@ -89,6 +104,5 @@ public class CartServiceImpl implements CartService {
             newItem.setQuantity(quantity);
             cart.getItems().add(newItem);
         }
-
     }
 }
