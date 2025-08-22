@@ -61,7 +61,7 @@ public class CartServiceImpl implements CartService {
                 .cartId(cart.getId())
                 .sessionId(cart.getSessionId())
                 .items(cart.getItems().stream()
-                        .map(this::from) // 👈 convierte cada CartItem -> CartItemResponse
+                        .map(this::from) 
                         .toList())
                 .build();
     }
