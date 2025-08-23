@@ -6,9 +6,9 @@ import com.example.cart_service.dto.CartResponse;
 
 public interface CartService {
 
-    void addToCartGuest(String sessionId, AddToCartRequest request);
+    CartResponse addToCartGuest(String sessionId, AddToCartRequest request);
 
-    void addToCartUser(String username, AddToCartRequest request);
+    CartResponse addToCartUser(String username, AddToCartRequest request);
 
     CartResponse getCartResponse(String username);
 

@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -21,17 +22,27 @@ public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
     private final ProductClient productClient;
 
-    public void addToCartGuest(String sessionId, AddToCartRequest request){
+    @Override
+    public CartResponse addToCartGuest(String sessionId, AddToCartRequest request){
         Cart cart = cartRepository.findUserBySessionId(sessionId)
                 .orElseGet(() -> createNewCartForGuest(sessionId));
 
+        addOrUpdateItems(cart, request.getProductId(), request.getQuantity());
+        cartRepository.save(cart);
+
+        return toCartResponse(cart);
+
     }
 
-    @Transactional
-    public void addToCartUser(String username, AddToCartRequest request) {
+    @Override
+    public CartResponse addToCartUser(String username, AddToCartRequest request) {
         Cart cart = cartRepository.findUserByUsername(username)
                 .orElseGet(() -> createNewCartForUser(username));
 
+        addOrUpdateItems(cart, request.getProductId(), request.getQuantity());
+        cartRepository.save(cart);
+
+        return toCartResponse(cart);
     }
 
     @Transactional
@@ -93,16 +104,26 @@ public class CartServiceImpl implements CartService {
 
     public void addOrUpdateItems(Cart cart, Long productId, int quantity) {
         Optional<CartItem> existingItem = cart.getItems().stream()
-                .filter(item -> item.getProductId().equals(productId))
+                .filter(item -> Objects.equals(item.getProductId(), productId))
                 .findFirst();
-
         if (existingItem.isPresent()) {
             existingItem.get().setQuantity(existingItem.get().getQuantity() + quantity);
         } else {
             CartItem newItem = new CartItem();
             newItem.setProductId(productId);
             newItem.setQuantity(quantity);
+            newItem.setCart(cart);
             cart.getItems().add(newItem);
         }
+    }
+
+    private CartResponse toCartResponse(Cart cart) {
+        return CartResponse.builder()
+                .cartId(cart.getId())
+                .sessionId(cart.getSessionId())
+                .items(cart.getItems().stream()
+                        .map(this::from)
+                        .toList())
+                .build();
     }
 }

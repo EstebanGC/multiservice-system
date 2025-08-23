@@ -1,6 +1,7 @@
 package com.example.cart_service.controller;
 
 import com.example.cart_service.dto.AddToCartRequest;
+import com.example.cart_service.dto.CartResponse;
 import com.example.cart_service.service.CartService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -32,17 +33,29 @@ public class CartController {
             userId = extractUserIdFromJwt(jwt); 
         }
 
+        CartResponse cartResponse;
         // Case 2: guest user by sessionid
         if (userId == null) {
             if (sessionId == null) {
                 sessionId = UUID.randomUUID().toString();
                 response.addHeader("Set-Cookie", "SESSIONID=" + sessionId + "; Path=/; HttpOnly");
             }
-            cartService.addToCartGuest(sessionId, request);
+            cartResponse = cartService.addToCartGuest(sessionId, request);
         } else {
-            cartService.addToCartUser(userId, request);
+            cartResponse = cartService.addToCartUser(userId, request);
         }
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(cartResponse);
+    }
+
+    private String extractUserIdFromJwt(String token) {
+        try {
+            String[] parts = token.split("\\."); // header.payload.signature
+            String payloadJson = new String(java.util.Base64.getDecoder().decode(parts[1]));
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            return mapper.readTree(payloadJson).get("sub").asText(); // o "username"
+        } catch (Exception e) {
+            throw new RuntimeException("Invalid JWT", e);
+        }
     }
 }
