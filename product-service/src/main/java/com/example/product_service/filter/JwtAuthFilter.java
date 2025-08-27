@@ -23,10 +23,29 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        String method = request.getMethod();
+
+        System.out.println("=== JWT Filter Debug ===");
+        System.out.println("Path: " + path);
+        System.out.println("Method: " + method);
+
+
+        boolean skip = path.startsWith("/api/products") &&
+                !path.equals("/api/products/product") &&
+                "GET".equals(method);
+
+        System.out.println("Skip filter: " + skip);
+        return skip;
+    }
+
+    @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
+        System.out.println("=== JWT Filter executing ===");
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {

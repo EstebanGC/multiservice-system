@@ -15,7 +15,6 @@ public class ProductController {
 
     private final ProductService productService;
 
-    //Configure this to protect the route
     @PostMapping("/product")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<Product> createProduct(@RequestBody Product product) {
@@ -25,5 +24,10 @@ public class ProductController {
     @GetMapping
     public ResponseEntity<List<Product>> getAllProducts() {
         return ResponseEntity.ok(productService.getAllProducts());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
+        return ResponseEntity.ok(productService.getProductById(id));
     }
 }

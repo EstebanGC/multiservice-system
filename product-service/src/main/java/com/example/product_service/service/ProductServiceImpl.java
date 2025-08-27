@@ -22,4 +22,10 @@ public class ProductServiceImpl implements ProductService {
     public Product createProduct(Product product){
         return productRepository.save(product);
     }
+
+    @Override
+    public Product getProductById(Long id) {
+        return productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+    }
 }
