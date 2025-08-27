@@ -32,7 +32,7 @@ public class ProductSecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/products").permitAll()
+                        .requestMatchers("/api/products", "/api/products/**").permitAll()
                         .requestMatchers("/api/products/product").hasAuthority("ROLE_ADMIN")
                         .anyRequest().authenticated()
                 )
@@ -53,7 +53,7 @@ public class ProductSecurityConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> User.withUsername(username)
-                .password("") // no se usa con JWT
+                .password("")
                 .authorities("ROLE_ADMIN")
                 .build();
     }
