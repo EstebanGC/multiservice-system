@@ -16,6 +16,9 @@ public class ProductRequest {
     @NotBlank
     private String description;
 
+    @NotBlank
+    private Integer stock;
+
     @Positive
     private double price;
 }
