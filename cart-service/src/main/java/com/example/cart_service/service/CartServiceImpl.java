@@ -64,15 +64,30 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public CartResponse getCartResponse(String username) {
-        Cart cart = cartRepository.findUserByUsername(username)
+    public CartResponse getCartResponseBySession(String sessionId) {
+        Cart cart = cartRepository.findUserBySessionId(sessionId)
                 .orElseThrow(() -> new IllegalStateException("Cart not found"));
 
         return CartResponse.builder()
                 .cartId(cart.getId())
                 .sessionId(cart.getSessionId())
                 .items(cart.getItems().stream()
-                        .map(this::from) 
+                        .map(this::from)
+                        .toList())
+                .build();
+    }
+
+    @Override
+    public CartResponse getCartResponseByUsername(String username) {
+        Cart cart = cartRepository.findUserByUsername(username)
+                .orElseThrow(() -> new IllegalStateException("Cart not found"));
+
+        return CartResponse.builder()
+                .cartId(cart.getId())
+                .sessionId(cart.getSessionId()) // This will be null for user carts
+                .username(cart.getUsername())   // Add username to response
+                .items(cart.getItems().stream()
+                        .map(this::from)
                         .toList())
                 .build();
     }

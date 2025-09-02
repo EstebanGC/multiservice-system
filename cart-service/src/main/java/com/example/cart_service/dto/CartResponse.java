@@ -17,5 +17,4 @@ public class CartResponse {
     private Long cartId;
     private String sessionId;
     private List<CartItemResponse> items;
-
 }

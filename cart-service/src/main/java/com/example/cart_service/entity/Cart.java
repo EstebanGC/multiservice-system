@@ -24,17 +24,4 @@ public class Cart {
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartItem> items = new ArrayList<>();
 
-    public static Cart createEmptyForUser(String username) {
-        return Cart.builder()
-                .username(username)
-                .items(new ArrayList<>())
-                .build();
-    }
-
-    public static Cart createEmptyForSession(String sessionId) {
-        return Cart.builder()
-                .sessionId(sessionId)
-                .items(new ArrayList<>())
-                .build();
-    }
 }

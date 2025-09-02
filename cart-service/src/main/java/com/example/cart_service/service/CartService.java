@@ -9,7 +9,9 @@ public interface CartService {
 
     CartResponse addToCartUser(String username, AddToCartRequest request);
 
-    CartResponse getCartResponse(String username);
+    CartResponse getCartResponseByUsername(String username);
+
+    CartResponse getCartResponseBySession(String sessionId);
 
 //    void removeItemBySession(String sessionId, Long productId);
 //

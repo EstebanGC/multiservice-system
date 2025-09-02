@@ -3,6 +3,7 @@ package com.example.cart_service.controller;
 import com.example.cart_service.dto.AddToCartRequest;
 import com.example.cart_service.dto.CartResponse;
 import com.example.cart_service.service.CartService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,24 @@ public class CartController {
 
     private final CartService cartService;
 
+    @PostMapping("/guest/add")
+    public ResponseEntity<CartResponse> addToCartGuest(
+            @RequestBody AddToCartRequest request,
+            HttpServletRequest httpRequest) {
+
+        String sessionId = httpRequest.getSession().getId();
+
+        CartResponse response = cartService.addToCartGuest(sessionId, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/guest")
+    public ResponseEntity<CartResponse> getGuestCart(HttpServletRequest httpRequest) {
+        String sessionId = httpRequest.getSession().getId();
+        CartResponse response = cartService.getCartResponseBySession(sessionId);
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping("/add")
     public ResponseEntity<?> addToCart(
             @RequestBody @Valid AddToCartRequest request,
@@ -30,21 +49,22 @@ public class CartController {
         // Case 1: user authed by jwt
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String jwt = authHeader.substring(7);
-            userId = extractUserIdFromJwt(jwt); 
+            userId = extractUserIdFromJwt(jwt);
         }
 
         CartResponse cartResponse;
+
         // Case 2: guest user by sessionid
-        if (userId == null) {
-            if (sessionId == null) {
+        if (userId != null) {
+            cartResponse = cartService.addToCartUser(userId, request);
+        } else {
+            if (sessionId == null || sessionId.trim().isEmpty()) {
                 sessionId = UUID.randomUUID().toString();
-                response.addHeader("Set-Cookie", "SESSIONID=" + sessionId + "; Path=/; HttpOnly");
+                response.addHeader("Set-Cookie",
+                        "SESSIONID=" + sessionId + "; Path=/; HttpOnly; Max-Age=86400");
             }
             cartResponse = cartService.addToCartGuest(sessionId, request);
-        } else {
-            cartResponse = cartService.addToCartUser(userId, request);
         }
-
         return ResponseEntity.ok(cartResponse);
     }
 
