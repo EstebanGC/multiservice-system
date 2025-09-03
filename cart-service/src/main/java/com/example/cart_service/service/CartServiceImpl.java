@@ -29,6 +29,7 @@ public class CartServiceImpl implements CartService {
 
         addOrUpdateItems(cart, request.getProductId(), request.getQuantity());
         cartRepository.save(cart);
+        System.out.println("Cart saved: id=" + cart.getId() + ", sessionId=" + cart.getSessionId());
 
         return toCartResponse(cart);
 
@@ -84,8 +85,8 @@ public class CartServiceImpl implements CartService {
 
         return CartResponse.builder()
                 .cartId(cart.getId())
-                .sessionId(cart.getSessionId()) // This will be null for user carts
-                .username(cart.getUsername())   // Add username to response
+                .sessionId(cart.getSessionId())
+                .username(cart.getUsername())
                 .items(cart.getItems().stream()
                         .map(this::from)
                         .toList())

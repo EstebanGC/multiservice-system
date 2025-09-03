@@ -3,79 +3,136 @@ package com.example.cart_service.controller;
 import com.example.cart_service.dto.AddToCartRequest;
 import com.example.cart_service.dto.CartResponse;
 import com.example.cart_service.service.CartService;
-import jakarta.servlet.http.HttpServletRequest;
+import java.util.logging.Logger;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
 @RestController
+@Slf4j
 @RequestMapping("/api/cart")
 @RequiredArgsConstructor
 public class CartController {
 
     private final CartService cartService;
 
-    @PostMapping("/guest/add")
-    public ResponseEntity<CartResponse> addToCartGuest(
-            @RequestBody AddToCartRequest request,
-            HttpServletRequest httpRequest) {
-
-        String sessionId = httpRequest.getSession().getId();
-
-        CartResponse response = cartService.addToCartGuest(sessionId, request);
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/guest")
-    public ResponseEntity<CartResponse> getGuestCart(HttpServletRequest httpRequest) {
-        String sessionId = httpRequest.getSession().getId();
-        CartResponse response = cartService.getCartResponseBySession(sessionId);
-        return ResponseEntity.ok(response);
-    }
-
     @PostMapping("/add")
-    public ResponseEntity<?> addToCart(
+    public ResponseEntity<CartResponse> addToCart(
             @RequestBody @Valid AddToCartRequest request,
             @CookieValue(value = "SESSIONID", required = false) String sessionId,
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             HttpServletResponse response
     ) {
-        String userId = null;
+        try {
+            String userId = extractUserIdFromAuthHeader(authHeader);
+            CartResponse cartResponse;
 
-        // Case 1: user authed by jwt
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String jwt = authHeader.substring(7);
-            userId = extractUserIdFromJwt(jwt);
-        }
+            if (userId != null) {
+                log.info("Authenticated user: {}", userId);
+                cartResponse = cartService.addToCartUser(userId, request);
+            } else {
+                sessionId = getOrCreateSessionId(sessionId, response);
+                log.info("Guest sessionId: {}", sessionId);
+                cartResponse = cartService.addToCartGuest(sessionId, request);
 
-        CartResponse cartResponse;
-
-        // Case 2: guest user by sessionid
-        if (userId != null) {
-            cartResponse = cartService.addToCartUser(userId, request);
-        } else {
-            if (sessionId == null || sessionId.trim().isEmpty()) {
-                sessionId = UUID.randomUUID().toString();
-                response.addHeader("Set-Cookie",
-                        "SESSIONID=" + sessionId + "; Path=/; HttpOnly; Max-Age=86400");
+                cartResponse.setSessionId(sessionId);
             }
-            cartResponse = cartService.addToCartGuest(sessionId, request);
+
+            return ResponseEntity.ok(cartResponse);
+
+        } catch (Exception e) {
+            log.error("Error adding to cart", e);
+            return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.ok(cartResponse);
+    }
+
+    private String getOrCreateSessionId(String sessionId, HttpServletResponse response) {
+        if (sessionId == null || sessionId.trim().isEmpty()) {
+            sessionId = UUID.randomUUID().toString();
+
+            String cookieValue = String.format(
+                    "SESSIONID=%s; Path=/; HttpOnly; Max-Age=86400; SameSite=Lax",
+                    sessionId
+            );
+            response.addHeader("Set-Cookie", cookieValue);
+            log.info("Generated new sessionId: {}", sessionId);
+        }
+        return sessionId;
+    }
+
+    @GetMapping
+    public ResponseEntity<CartResponse> getCart(
+            @CookieValue(value = "SESSIONID", required = false) String sessionId,
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            HttpServletResponse response
+    ) {
+        try {
+            String userId = extractUserIdFromAuthHeader(authHeader);
+            CartResponse cartResponse;
+
+            if (userId != null) {
+                log.info("Fetching cart for user: {}", userId);
+                cartResponse = cartService.getCartResponseByUsername(userId);
+            } else {
+                sessionId = getOrCreateSessionId(sessionId, response);
+                log.info("Fetching cart for sessionId: {}", sessionId);
+                cartResponse = cartService.getCartResponseBySession(sessionId);
+            }
+
+            return ResponseEntity.ok(cartResponse);
+
+        } catch (IllegalStateException e) {
+            log.warn("Cart not found: {}", e.getMessage());
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            log.error("Error getting cart", e);
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    private String extractUserIdFromAuthHeader(String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return null;
+        }
+
+        try {
+            String jwt = authHeader.substring(7);
+            return extractUserIdFromJwt(jwt);
+        } catch (Exception e) {
+            log.warn("Failed to extract user from JWT: {}", e.getMessage());
+            return null;
+        }
     }
 
     private String extractUserIdFromJwt(String token) {
         try {
-            String[] parts = token.split("\\."); // header.payload.signature
-            String payloadJson = new String(java.util.Base64.getDecoder().decode(parts[1]));
+            String[] parts = token.split("\\.");
+            if (parts.length != 3) {
+                throw new IllegalArgumentException("Invalid JWT format");
+            }
+
+            String payloadJson = new String(java.util.Base64.getUrlDecoder().decode(parts[1]));
             com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-            return mapper.readTree(payloadJson).get("sub").asText(); // o "username"
+            com.fasterxml.jackson.databind.JsonNode payload = mapper.readTree(payloadJson);
+
+            if (payload.has("sub")) {
+                return payload.get("sub").asText();
+            } else if (payload.has("username")) {
+                return payload.get("username").asText();
+            } else if (payload.has("email")) {
+                return payload.get("email").asText();
+            }
+
+            throw new IllegalArgumentException("No user identifier found in JWT");
+
         } catch (Exception e) {
-            throw new RuntimeException("Invalid JWT", e);
+            throw new RuntimeException("Invalid JWT: " + e.getMessage(), e);
         }
     }
+
 }

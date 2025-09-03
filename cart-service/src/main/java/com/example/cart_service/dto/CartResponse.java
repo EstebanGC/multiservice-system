@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 @Builder
 public class CartResponse {
     private Long cartId;
+    private String username;
     private String sessionId;
     private List<CartItemResponse> items;
 }
