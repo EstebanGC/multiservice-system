@@ -3,7 +3,6 @@ package com.example.cart_service.controller;
 import com.example.cart_service.dto.AddToCartRequest;
 import com.example.cart_service.dto.CartResponse;
 import com.example.cart_service.service.CartService;
-import java.util.logging.Logger;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -134,5 +133,4 @@ public class CartController {
             throw new RuntimeException("Invalid JWT: " + e.getMessage(), e);
         }
     }
-
 }

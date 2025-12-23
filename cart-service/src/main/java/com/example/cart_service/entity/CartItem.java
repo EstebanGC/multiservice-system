@@ -17,6 +17,7 @@ public class CartItem {
 
     private Long productId;
 
+    @Column(nullable = false)
     private Integer quantity;
 
     @ManyToOne(fetch = FetchType.LAZY)

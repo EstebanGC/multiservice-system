@@ -22,18 +22,29 @@ public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
     private final ProductClient productClient;
 
-    @Override
-    public CartResponse addToCartGuest(String sessionId, AddToCartRequest request){
-        Cart cart = cartRepository.findUserBySessionId(sessionId)
-                .orElseGet(() -> createNewCartForGuest(sessionId));
+    // ======================
+    // GET CART
+    // ======================
 
-        addOrUpdateItems(cart, request.getProductId(), request.getQuantity());
-        cartRepository.save(cart);
-        System.out.println("Cart saved: id=" + cart.getId() + ", sessionId=" + cart.getSessionId());
+    @Override
+    public CartResponse getCartResponseByUsername(String username) {
+        Cart cart = cartRepository.findUserByUsername(username)
+                .orElseThrow(() -> new IllegalStateException("Cart not found for user: " + username));
 
         return toCartResponse(cart);
-
     }
+
+    @Override
+    public CartResponse getCartResponseBySession(String sessionId) {
+        Cart cart = cartRepository.findUserBySessionId(sessionId)
+                .orElseThrow(() -> new IllegalStateException("Cart not found for session: " + sessionId));
+
+        return toCartResponse(cart);
+    }
+
+    // ======================
+    // ADD TO CART
+    // ======================
 
     @Override
     public CartResponse addToCartUser(String username, AddToCartRequest request) {
@@ -46,13 +57,27 @@ public class CartServiceImpl implements CartService {
         return toCartResponse(cart);
     }
 
+    @Override
+    public CartResponse addToCartGuest(String sessionId, AddToCartRequest request) {
+        Cart cart = cartRepository.findUserBySessionId(sessionId)
+                .orElseGet(() -> createNewCartForGuest(sessionId));
+
+        addOrUpdateItems(cart, request.getProductId(), request.getQuantity());
+        cartRepository.save(cart);
+
+        return toCartResponse(cart);
+    }
+
+    // ======================
+    // REMOVE / CLEAR
+    // ======================
+
     @Transactional
     public void removeItem(String sessionId, Long productId) {
         Cart cart = cartRepository.findUserBySessionId(sessionId)
                 .orElseThrow(() -> new IllegalStateException("Cart not found"));
 
         cart.getItems().removeIf(item -> item.getProductId().equals(productId));
-        cartRepository.save(cart);
     }
 
     @Transactional
@@ -61,32 +86,17 @@ public class CartServiceImpl implements CartService {
                 .orElseThrow(() -> new IllegalStateException("Cart not found"));
 
         cart.getItems().clear();
-        cartRepository.save(cart);
     }
 
-    @Override
-    public CartResponse getCartResponseBySession(String sessionId) {
-        Cart cart = cartRepository.findUserBySessionId(sessionId)
-                .orElseThrow(() -> new IllegalStateException("Cart not found"));
+    // ======================
+    // MAPPERS
+    // ======================
 
+    private CartResponse toCartResponse(Cart cart) {
         return CartResponse.builder()
                 .cartId(cart.getId())
+                .username(cart.getUsername())   // null si es guest (correcto)
                 .sessionId(cart.getSessionId())
-                .items(cart.getItems().stream()
-                        .map(this::from)
-                        .toList())
-                .build();
-    }
-
-    @Override
-    public CartResponse getCartResponseByUsername(String username) {
-        Cart cart = cartRepository.findUserByUsername(username)
-                .orElseThrow(() -> new IllegalStateException("Cart not found"));
-
-        return CartResponse.builder()
-                .cartId(cart.getId())
-                .sessionId(cart.getSessionId())
-                .username(cart.getUsername())
                 .items(cart.getItems().stream()
                         .map(this::from)
                         .toList())
@@ -94,10 +104,6 @@ public class CartServiceImpl implements CartService {
     }
 
     private CartItemResponse from(CartItem item) {
-
-        System.out.println("=== from() Debug ===");
-        System.out.println("CartItem ID: " + item.getId());
-        System.out.println("CartItem ProductId: " + item.getProductId());
         ProductClient.ProductDTO product = productClient.getProduct(item.getProductId());
 
         return CartItemResponse.builder()
@@ -108,62 +114,37 @@ public class CartServiceImpl implements CartService {
                 .build();
     }
 
-    public Cart createNewCartForGuest(String sessionId) {
+    // ======================
+    // HELPERS
+    // ======================
+
+    private Cart createNewCartForGuest(String sessionId) {
         Cart cart = new Cart();
         cart.setSessionId(sessionId);
         cart.setItems(new ArrayList<>());
         return cart;
     }
 
-    public Cart createNewCartForUser(String username) {
+    private Cart createNewCartForUser(String username) {
         Cart cart = new Cart();
         cart.setUsername(username);
         cart.setItems(new ArrayList<>());
         return cart;
     }
 
-    public void addOrUpdateItems(Cart cart, Long productId, int quantity) {
-        System.out.println("=== addOrUpdateItems Debug ===");
-        System.out.println("ProductId received: " + productId);
-
+    private void addOrUpdateItems(Cart cart, Long productId, int quantity) {
         Optional<CartItem> existingItem = cart.getItems().stream()
                 .filter(item -> Objects.equals(item.getProductId(), productId))
                 .findFirst();
 
         if (existingItem.isPresent()) {
-            System.out.println("Updating existing item with productId: " + existingItem.get().getProductId());
             existingItem.get().setQuantity(existingItem.get().getQuantity() + quantity);
         } else {
-            System.out.println("Creating new CartItem");
             CartItem newItem = new CartItem();
             newItem.setProductId(productId);
             newItem.setQuantity(quantity);
             newItem.setCart(cart);
             cart.getItems().add(newItem);
-            System.out.println("New CartItem productId set to: " + newItem.getProductId());
         }
-
-        System.out.println("Cart items after operation:");
-        cart.getItems().forEach(item ->
-                System.out.println("Item ID: " + item.getId() + ", ProductId: " + item.getProductId())
-        );
-    }
-
-    private CartResponse toCartResponse(Cart cart) {
-        System.out.println("=== toCartResponse Debug ===");
-        System.out.println("Cart ID: " + cart.getId());
-        System.out.println("Number of items: " + cart.getItems().size());
-
-        cart.getItems().forEach(item ->
-                System.out.println("Processing item - ID: " + item.getId() + ", ProductId: " + item.getProductId())
-        );
-
-        return CartResponse.builder()
-                .cartId(cart.getId())
-                .sessionId(cart.getSessionId())
-                .items(cart.getItems().stream()
-                        .map(this::from)
-                        .toList())
-                .build();
     }
 }
