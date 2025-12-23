@@ -1,0 +1,5 @@
+Error found during code process:
+
+1. Jwt dependencies, interfaces and methods were deprecated
+2. Database (MySQL) was not connected and the database was not created previously
+
